@@ -267,7 +267,7 @@ void changePatientsDetails(bool doctorView, int ID) {
 }
 
 
-    void accessPatientsDetails(bool doctorView) {
+void accessPatientsDetails(bool doctorView) {
 
 
         clearConsole();
@@ -304,7 +304,7 @@ void changePatientsDetails(bool doctorView, int ID) {
         }
     }
 
-    void calculateAverageAges() {
+void calculateAverageAges() {
         int averageSmokingAge = 0;
         int smokerCount = 0;
 
@@ -331,13 +331,13 @@ void changePatientsDetails(bool doctorView, int ID) {
         std::cout << "Average Cancer Age: " << (cancerCount == 0 ? "N/A" : std::to_string(averageCancerAge / cancerCount)) << std::endl; // Check if there is any one with Cancer before calculating the average
     }
 
-    void calculateAvageCosts() {
+void calculateAvageCosts() {
 
         //NEED TO DO
 
     }
 
-    void displayStatistics() { // Display general statistics
+void displayStatistics() { // Display general statistics
 
         clearConsole();
 
@@ -348,7 +348,7 @@ void changePatientsDetails(bool doctorView, int ID) {
 
     }
 
-    bool importUsers() {
+bool importUsers() {
         std::ifstream inputtedCSV(USERDETAILS);
 
         if (!inputtedCSV) { // Check if file opened successfully
@@ -399,7 +399,7 @@ void changePatientsDetails(bool doctorView, int ID) {
     
     
 
-    void registerNewUser(std::string newUserRole) {
+void registerNewUser(std::string newUserRole) {
         std::string newUserName; //Get new users details
         std::string newUserPassword;
         int newUserAge;
@@ -423,7 +423,7 @@ void changePatientsDetails(bool doctorView, int ID) {
         userContinue();
     }
 
-    bool getConditions() {
+bool getConditions() {
         std::ifstream conditionsCSV(CONDITIONS);  // Open CONDITIONS file
 
         if (!conditionsCSV) {  // Error checking
@@ -433,22 +433,24 @@ void changePatientsDetails(bool doctorView, int ID) {
 
         std::string ID, condition, treatment, frequency, cost, treatmentLength;
         int intTreatmentLength = 0;
+        int intID = 0;
 
-        while (std::getline(conditionsCSV, ID, ',') &&
-            std::getline(conditionsCSV, condition, ',') &&
-            std::getline(conditionsCSV, treatment, ',') &&
-            std::getline(conditionsCSV, frequency, ',') &&
-            std::getline(conditionsCSV, cost, ',') &&
-            std::getline(conditionsCSV, treatmentLength)) {
+        while (conditionsCSV.peek() != EOF){
 
-            if (treatmentLength == "Treatment Length") continue;  // Skip header row
-
-            int intID = std::stoi(ID);
+            std::getline(conditionsCSV, ID, ',');
+            std::getline(conditionsCSV, condition, ',');
+            std::getline(conditionsCSV, treatment, ',');
+            std::getline(conditionsCSV, frequency, ',');
+            std::getline(conditionsCSV, cost, ',');
+            std::getline(conditionsCSV, treatmentLength, '\r'); // \r because my personal computer is a mac - REMOVE WHEN SUBMITTING
+            
+            if (ID == "ID") {  // Skip header row
+                continue; 
+            }
+            intID = std::stoi(ID);
             intTreatmentLength = (treatmentLength == "N/A") ? 999 : (treatmentLength == "0" ? 0 : std::stoi(treatmentLength));
-
             conditions.push_back(Condition(intID, condition, treatment, frequency, cost, intTreatmentLength));  // Add to vector
         }
-
         return true;
     }
 
@@ -457,7 +459,7 @@ void changePatientsDetails(bool doctorView, int ID) {
    
     
 
-    bool readLoginDetails(const std::string& inputtedUsername, const std::string& inputtedPassword) {
+bool readLoginDetails(const std::string& inputtedUsername, const std::string& inputtedPassword) {
         for (const User& user : users) { 
             if (user.getUserName() == inputtedUsername && user.getPassword() == inputtedPassword) {
                 loggedUser = user;  
@@ -469,12 +471,12 @@ void changePatientsDetails(bool doctorView, int ID) {
 
    
     
-    void showAccessDenied(const std::string& message) {
+void showAccessDenied(const std::string& message) {
         std::cout << message;
         userContinue();
     }
 
-    void displayMenu() { // Display main menu screen
+void displayMenu() { // Display main menu screen
         clearConsole();
 
         std::cout << "Welcome " << loggedUser.getUserName() << '\n';
@@ -542,7 +544,7 @@ void changePatientsDetails(bool doctorView, int ID) {
 
 
 
-    void displayLogin() {
+void displayLogin() {
         updateUsersCSV();
         bool validLogin = false; // Track login status
 
@@ -577,7 +579,7 @@ void changePatientsDetails(bool doctorView, int ID) {
     }
 
 
-    void displayHomeMenu() { // Display the initial menu selection screen
+void displayHomeMenu() { // Display the initial menu selection screen
         bool exit = false;
         int menuOption = 0;
 
@@ -606,7 +608,7 @@ void changePatientsDetails(bool doctorView, int ID) {
         }
     }
 
-    int main()
+int main()
     {
         getConditions(); // Load Conditions
         importUsers(); // Load Users
