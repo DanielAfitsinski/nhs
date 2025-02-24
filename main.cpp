@@ -24,13 +24,13 @@ private:
     std::string _condition;
     std::string _treatment;
     std::string _frequency;
-    std::string _cost;
+    double _dailyCost;
     int _treatmentLength;
 
 public:
     // Constructor with initializer list
-    Condition(int cID, const std::string& c, const std::string& t, const std::string& f, const std::string& co, int tl)
-        : _conditionID(cID), _condition(c), _treatment(t), _frequency(f), _cost(co), _treatmentLength(tl) {
+    Condition(int cID, const std::string& c, const std::string& t, const std::string& f, const double& co, int tl)
+        : _conditionID(cID), _condition(c), _treatment(t), _frequency(f), _dailyCost(co), _treatmentLength(tl) {
        
         _condition = (_conditionID == 0) ? "Healthy" : _condition;
         _treatment = (_conditionID == 0) ? "N/A" : _treatment;
@@ -38,7 +38,7 @@ public:
     }
 
     // Default Constructor
-    Condition() : _conditionID(0), _condition(""), _treatment(""), _frequency(""), _cost(""), _treatmentLength(0) {
+    Condition() : _conditionID(0), _condition(""), _treatment(""), _frequency(""), _dailyCost(0.0), _treatmentLength(0) {
         _condition = (_conditionID == 0) ? "Healthy" : _condition;
         _treatment = (_conditionID == 0) ? "N/A" : _treatment;
     }
@@ -48,14 +48,14 @@ public:
     const std::string& getCondition() const { return _condition; }
     const std::string& getTreatment() const { return _treatment; }
     const std::string& getFrequency() const { return _frequency; }
-    const std::string& getCost() const { return _cost; }
+    const double getDailyCost() const { return _dailyCost; }
 
     // Setters
     void setConditionID(int cID) { _conditionID = cID; }
     void setCondition(const std::string& c) { _condition = c; }
     void setTreatment(const std::string& t) { _treatment = t; }
     void setFrequency(const std::string& f) { _frequency = f; }
-    void setCost(const std::string& co) { _cost = co; }
+    void setDailyCost(const double co) { _dailyCost = co; }
     void setTreatmentLength(int tl) { _treatmentLength = tl; }
 
     // Display the treatment length in Years/Months
@@ -82,6 +82,19 @@ public:
         else {
             std::cout << "Treatment Length: N/A";
         }
+    }
+
+    void calculateAndDisplayAvageCosts() {
+
+        double weeklyCost = _dailyCost * 7;
+        double monthlyCost = (_dailyCost * 365) / 12; // Most accurage way to calculate monthly cost
+        double yearlyCost = _dailyCost * 365;
+
+        std::cout << "Daily Cost: £" << _dailyCost
+          << "\nWeekly Cost: £" << weeklyCost
+          << "\nMonthly Cost: £" << monthlyCost
+          << "\nYearly Cost: £" << yearlyCost << std::endl;
+
     }
 };
 
@@ -160,20 +173,25 @@ class User {
 
     std::vector<User> users; // Vector containing all users
 
-void displayUserDetails(User& user) { // Displays the logged in users details including medical history
+void displayUserDetails(User& user) { // Displays the passed users details including medical history
 
         clearConsole();
         
         std::cout << "Role: " << user.getRole() << "\n"
             << "User: " << user.getUserName() << "\n"
             << "Age: " << user.getAge() << "\n"
-            << "Doctor: " << user.getDoctorName() << "\n";
+            << "Doctor: " << user.getDoctorName() << "\n"
+            ;
 
         Condition usersCondition = user.getCondition();
-        std::cout << "Condition: " << usersCondition.getCondition() << "\n"
-            << "Treatment: " << usersCondition.getTreatment() << "\n";
+        std::cout << "\nCondition: " << usersCondition.getCondition() << "\n"
+            << "Treatment: " << usersCondition.getTreatment() << "\n\n";
+
 
         usersCondition.displayTreatmentLength();
+        std::cout << "\nFrequency: " << usersCondition.getFrequency() << "\n\n";
+        
+        usersCondition.calculateAndDisplayAvageCosts();
 
 
         
@@ -331,11 +349,7 @@ void calculateAverageAges() {
         std::cout << "Average Cancer Age: " << (cancerCount == 0 ? "N/A" : std::to_string(averageCancerAge / cancerCount)) << std::endl; // Check if there is any one with Cancer before calculating the average
     }
 
-void calculateAvageCosts() {
 
-        //NEED TO DO
-
-    }
 
 void displayStatistics() { // Display general statistics
 
@@ -434,6 +448,7 @@ bool getConditions() {
         std::string ID, condition, treatment, frequency, cost, treatmentLength;
         int intTreatmentLength = 0;
         int intID = 0;
+        double doubleCost = 0.0;
 
         while (conditionsCSV.peek() != EOF){
 
@@ -449,7 +464,8 @@ bool getConditions() {
             }
             intID = std::stoi(ID);
             intTreatmentLength = (treatmentLength == "N/A") ? 999 : (treatmentLength == "0" ? 0 : std::stoi(treatmentLength));
-            conditions.push_back(Condition(intID, condition, treatment, frequency, cost, intTreatmentLength));  // Add to vector
+            doubleCost = std::stod(cost);
+            conditions.push_back(Condition(intID, condition, treatment, frequency, doubleCost, intTreatmentLength));  // Add to vector
         }
         return true;
     }

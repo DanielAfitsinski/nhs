@@ -1,11 +1,11 @@
 ID,Condition,Treatment,Frequency,Cost,Treatment Length
 0,,,N/A,0,N/A
-1,Diabetes (type 1),Insulin,2 shots a day,7.52,N/A
+1,Diabetes (type 1),Insulin,2 shots a day,15.02,N/A
 2,Diabetes (type 2),Insulin,1 shot a day,7.52,N/A
-3,Lung Cancer (stage 1),Chemotherapy,Once every 4 weeks,10000,6
-4,Lung Cancer (stage 2),Chemotherapy,Once every 2 weeks,10000,6
-5,Lung Cancer (stage 3),Terminal,Once a week,10000,12
-6,Lung Cancer (stage 4),Terminal,N/A,0,0
-7,Smoking (1 pack / month),Nicotine Tablets,1 100mg pill a day,5.63 per 8,6
-8,Smoking (1 pack / week),Nicotine Tablets,2 500mg pills a day,5.63 per 8,12
-9,Smoking (1 pack / day),Nicotine Patch,1 every 24 hours,3.64,24
+3,Lung Cancer (stage 1),Chemotherapy,One round every 4 weeks,357.14,6
+4,Lung Cancer (stage 2),Chemotherapy,One round every 2 weeks,714.29,6
+5,Lung Cancer (stage 3),Terminal,One round a week,1428.57,12
+6,Lung Cancer (stage 4),Terminal,N/A,0.0,0
+7,Smoking (1 pack / month),Nicotine Tablets,1 100mg pill a day,0.70,6
+8,Smoking (1 pack / week),Nicotine Tablets,2 500mg pills a day,1.41,12
+9,Smoking (1 pack / day),Nicotine Patch,1 patch every 24 hours,3.64,24
