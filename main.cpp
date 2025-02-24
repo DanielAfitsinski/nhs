@@ -84,16 +84,22 @@ public:
         }
     }
 
-    void calculateAndDisplayAvageCosts() {
+    void calculateAndDisplayAvageCosts() const {
 
-        double weeklyCost = _dailyCost * 7;
-        double monthlyCost = (_dailyCost * 365) / 12; // Most accurage way to calculate monthly cost
-        double yearlyCost = _dailyCost * 365;
-
-        std::cout << "Daily Cost: £" << _dailyCost
-          << "\nWeekly Cost: £" << weeklyCost
-          << "\nMonthly Cost: £" << monthlyCost
-          << "\nYearly Cost: £" << yearlyCost << std::endl;
+        if(_dailyCost != 0.0){
+            
+            double monthlyCost = (_dailyCost * 365) / 12; // Most accurage way to calculate monthly cost
+            double yearlyCost = _dailyCost * 365;
+            double weeklyCost = _dailyCost * 7;
+    
+            std::cout << "Daily Cost: £" << _dailyCost
+             << "\nWeekly Cost: £" << weeklyCost
+             << "\nMonthly Cost: £" << monthlyCost
+             << "\nYearly Cost: £" << yearlyCost << std::endl;
+        }
+        else{
+            std::cout << "No Cost";
+        }
 
     }
 };
@@ -184,14 +190,19 @@ void displayUserDetails(User& user) { // Displays the passed users details inclu
             ;
 
         Condition usersCondition = user.getCondition();
-        std::cout << "\nCondition: " << usersCondition.getCondition() << "\n"
-            << "Treatment: " << usersCondition.getTreatment() << "\n\n";
+
+        std::cout << "\nCondition: " << usersCondition.getCondition() << "\n";
+        if(usersCondition.getCondition() != "Healthy"){
+            std::cout << "Treatment: " << usersCondition.getTreatment() << "\n\n";
 
 
-        usersCondition.displayTreatmentLength();
-        std::cout << "\nFrequency: " << usersCondition.getFrequency() << "\n\n";
+            usersCondition.displayTreatmentLength();
+            std::cout << "\nFrequency: " << usersCondition.getFrequency() << "\n\n";
         
-        usersCondition.calculateAndDisplayAvageCosts();
+            usersCondition.calculateAndDisplayAvageCosts();
+        }
+
+        
 
 
         
@@ -350,14 +361,24 @@ void calculateAverageAges() {
     }
 
 
+void calculateCostForEveryCondition(){
+        for(auto& condition : conditions) {
+            std::cout << "\n\nCondition: " << condition.getCondition() << "\n" << "Treatment: " << condition.getTreatment() << "\n";
+            condition.displayTreatmentLength();
+            std::cout << "\n";
+            condition.calculateAndDisplayAvageCosts();
+        }
+    }
+
 
 void displayStatistics() { // Display general statistics
 
         clearConsole();
 
         calculateAverageAges();
-
-
+        std::cout << "\n";
+        calculateCostForEveryCondition();
+       
         userContinue();
 
     }
