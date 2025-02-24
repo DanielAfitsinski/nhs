@@ -3,6 +3,9 @@
 #include <vector> // Added for vector data structure
 #include <fstream> // Added for openining files in read mode
 #include <sstream> // Added for opening files in append mode
+#include <openssl/sha.h> // Added for hashing passwords
+#include <iomanip> // Added for setw and setfill
+
 
 const std::string USERDETAILS = "USERDETAILS.csv"; // Constant File path to text file containing login details
 const std::string CONDITIONS = "CONDITIONS.csv"; // Constant File path to text file containing all Conditions
@@ -84,6 +87,10 @@ public:
         }
     }
 
+    
+
+
+    // Calculate and display the average cost of the condition
     void calculateAndDisplayAvageCosts() const {
 
         if(_dailyCost != 0.0){
@@ -105,8 +112,11 @@ public:
 };
 
 
-    std::vector<Condition> conditions;  // Instantiate Vector containing all the possible conditions - to be populated with getConditions()
 
+
+
+    std::vector<Condition> conditions;  // Instantiate Vector containing all the possible conditions - to be populated with getConditions()
+ // User Class
 class User {
     private:
         int _age;
@@ -129,8 +139,8 @@ class User {
 
     public:
         // Constructor
-        User(int& userID, const std::string& userName, const std::string& role,
-            const std::string& doctorName, const std::string& password, int& age, int& conditionID)
+        User(int userID, const std::string& userName, const std::string& role,
+            const std::string& doctorName, const std::string& password, int age, int conditionID)
             : _userID(userID), _userName(userName), _role(role),
             _doctorName(doctorName), _userPassword(password), _age(age) {
 
@@ -141,7 +151,7 @@ class User {
         }
 
         // Default Constructor
-        User() : _userID(0), _userName(""), _role(""), _doctorName(""), _userPassword(""), _age(0) {}
+        //User() : _userID(0), _userName(""), _role(""), _doctorName(""), _userPassword(""), _age(0) {}
 
         // Getters
         int getUserID() const { return _userID; }
@@ -179,6 +189,20 @@ class User {
 
     std::vector<User> users; // Vector containing all users
 
+
+
+// Function to hash passwords using SHA-256
+std::string hashPassword(const std::string& password) {
+    unsigned char hash[SHA256_DIGEST_LENGTH];
+    SHA256(reinterpret_cast<const unsigned char*>(password.c_str()), password.length(), hash);
+    
+    std::ostringstream ss;
+    for (int i = 0; i < SHA256_DIGEST_LENGTH; i++) {
+        ss << std::hex << std::setw(2) << std::setfill('0') << (int)hash[i];
+    }
+    return ss;
+}
+
 void displayUserDetails(User& user) { // Displays the passed users details including medical history
 
         clearConsole();
@@ -208,7 +232,7 @@ void displayUserDetails(User& user) { // Displays the passed users details inclu
         
 
     }
-
+ // Function to display all conditions
 void displayConditions() {
 
         clearConsole();
@@ -221,6 +245,7 @@ void displayConditions() {
 
         userContinue();
     }
+
 void updateUsersCSV() {
     std::ofstream CSV(USERDETAILS); // Open USERDETAILS CSV
 
@@ -250,7 +275,7 @@ void updateUsersCSV() {
 }
 
 
-
+// Function to change the details of a patient
 void changePatientsDetails(bool doctorView, int ID) {
     clearConsole();
 
@@ -295,7 +320,7 @@ void changePatientsDetails(bool doctorView, int ID) {
     }
 }
 
-
+// Function to access the details of a patient
 void accessPatientsDetails(bool doctorView) {
 
 
@@ -332,7 +357,7 @@ void accessPatientsDetails(bool doctorView) {
             }
         }
     }
-
+// Function to calculate the average ages of smokers and cancer patients
 void calculateAverageAges() {
         int averageSmokingAge = 0;
         int smokerCount = 0;
@@ -423,7 +448,7 @@ bool importUsers() {
             }
 
             // Add the user to the list using push_back
-            users.push_back(User(intID, username, role, doctorName, password, intAge, intCondition));
+            users.push_back(User(intID, username, role, doctorName, password, intAge, intCondition)); // Hash the password
         }
 
         inputtedCSV.close();
@@ -444,6 +469,9 @@ void registerNewUser(std::string newUserRole) {
 
         std::cout << "Enter new " << newUserRole << " Password: ";
         std::cin >> newUserPassword;
+
+        
+        newUserPassword = hashPassword(newUserPassword);
 
         std::cout << "Enter new " << newUserRole << " Age: ";
         std::cin >> newUserAge;
@@ -498,7 +526,7 @@ bool getConditions() {
 
 bool readLoginDetails(const std::string& inputtedUsername, const std::string& inputtedPassword) {
         for (const User& user : users) { 
-            if (user.getUserName() == inputtedUsername && user.getPassword() == inputtedPassword) {
+            if (user.getUserName() == inputtedUsername && user.getPassword() == hashPassword(inputtedPassword)) {  // Check if the inputted details match any in the list
                 loggedUser = user;  
                 return true; 
             }
@@ -582,7 +610,7 @@ void displayMenu() { // Display main menu screen
 
 
 void displayLogin() {
-        updateUsersCSV();
+        
         bool validLogin = false; // Track login status
 
         while (!validLogin) {

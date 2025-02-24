@@ -1,0 +1,26 @@
+{
+    "configurations": [
+        {
+            "name": "Mac",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "/usr/local/include",
+                "/usr/local/lib",
+                "/usr/local/bin",
+                "/opt/homebrew/include",
+                "/opt/homebrew/lib",
+                "/opt/homebrew/bin",
+                "/opt/homebrew/Cellar/openssl@3/3.4.1/include",
+                "/opt/homebrew/Cellar/openssl@3/3.4.1/lib"
+            ],
+            "defines": [],
+            "macFrameworkPath": [
+                "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks"
+            ],
+            "cStandard": "c17",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "macos-clang-arm64"
+        }
+    ],
+    "version": 4
+}
