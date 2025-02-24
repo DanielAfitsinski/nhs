@@ -1,0 +1,7 @@
+ID,Username,Password,Age,Role,DoctorName,ConditionID
+1,TestPharmacist,SecurePharmacist,48,Pharmacist,N/A,0
+2,TestPatient,SecurePatient,20,Patient,TestDoctor,9
+5,TestPatient,SecurePatient,20,Patient,TestDoctor,4
+3,TestDoctor,SecureDoctor,30,Doctor,N/A,0
+4,s,d,5,Patient,N/A,0
+6,yay,test,5,Patient,N/A,0
