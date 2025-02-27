@@ -1,2 +1,6 @@
 ID,Username,Password,Age,Role,DoctorName,ConditionID
-1,test,7b3d979ca8330a94fa7e9e1b466d8b99e0bcdea1ec90596c0dcc8d7ef6b4300c,10,Patient,N/A,0
+1,test,7b3d979ca8330a94fa7e9e1b466d8b99e0bcdea1ec90596c0dcc8d7ef6b4300c,10,Patient,doctor,9
+2,please,00e13ed7af55b27622f1d6eab5bec0147e68efe28dc2b12461117afa1a5ed40e,10,Patient,doctor,0
+3,alexx,56ccc4dcfc96534b06fc0c08a301be24f13b491484d5d984953cc0dba9bbb89a,5,Patient,doctor,0
+4,j,8254c329a92850f6d539dd376f4816ee2764517da5e0235514af433164480d7a,0,Patient,doctor,5
+5,doctor,934b3e3abc31fffd702f8e63ea67a28fa640e6beb77fe7ec1d8951d856e52304,20,Doctor,N/A,0

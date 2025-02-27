@@ -151,7 +151,7 @@ class User {
         }
 
         // Default Constructor
-        //User() : _userID(0), _userName(""), _role(""), _doctorName(""), _userPassword(""), _age(0) {}
+        User() : _userID(0), _userName(""), _role(""), _doctorName(""), _userPassword(""), _age(0) {}
 
         // Getters
         int getUserID() const { return _userID; }
@@ -200,7 +200,7 @@ std::string hashPassword(const std::string& password) {
     for (int i = 0; i < SHA256_DIGEST_LENGTH; i++) {
         ss << std::hex << std::setw(2) << std::setfill('0') << (int)hash[i];
     }
-    return ss;
+    return ss.str();
 }
 
 void displayUserDetails(User& user) { // Displays the passed users details including medical history
