@@ -6,6 +6,16 @@
 #include <iomanip> // Added for setw and setfill
 
 
+//TODO - Assign Nurses To Patients
+//TODO - Allow Doctors To Assign Themselves To Patients With No Doctors
+//TODO - Allow Patients To Have Multiple Doctors/Nurses
+//TODO - Fix Logic For Empty PatientsConditions Vector vs Having A 0 For Healthy Condition
+//TODO - Validation
+//TODO - Not Allow Anyone Doing Chemotherapy To Have Other Conditions/Treatments
+//TODO - Add Logic To Statistic To Check Frequency Of Smokers + Cancer Patients
+//TODO - Add Patient History Of Smoking / Cancer / Diabetes ??
+
+
 const std::string USERDETAILS = "USERDETAILS.csv"; // Constant File path to text file containing login details
 const std::string CONDITIONS = "CONDITIONS.csv"; // Constant File path to text file containing all Conditions
 
