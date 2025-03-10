@@ -1,4 +1,3 @@
-
 #include <iostream> // Added for Inputting and Outputting to the console
 #include <vector> // Added for vector data structure
 #include <fstream> // Added for openining files in read mode
@@ -275,6 +274,39 @@ void updateUsersCSV() {
 }
 
 
+bool isValidPassword(const std::string& password) {
+    bool hasLower = false;
+    bool hasUpper = false;
+    bool hasDigit = false;
+    bool hasSpecial = false;
+
+    // Check for each character in the password
+    for (char ch : password) {
+        if (std::islower(ch)) hasLower = true;
+        if (std::isupper(ch)) hasUpper = true;
+        if (std::isdigit(ch)) hasDigit = true;
+        if (!std::isalnum(ch)) hasSpecial = true; // Special characters are non-alphanumeric
+    }
+
+    // Return true if all conditions are met
+    return hasLower && hasUpper && hasDigit && hasSpecial;
+}
+
+// Function to check if a string contains any whitespace
+bool hasWhitespace(const std::string& str) {
+    return std::any_of(str.begin(), str.end(), ::isspace);
+}
+
+bool containsSpecialCharacters(const std::string& username) {
+    for (char ch : username) {
+        if (!std::isalnum(ch) && ch != '_') {
+            return true; // Found a special character
+        }
+    }
+    return false; // No special characters found
+}
+
+
 // Function to change the details of a patient
 void changePatientsDetails(bool doctorView, int ID) {
     clearConsole();
@@ -464,14 +496,44 @@ void registerNewUser(std::string newUserRole) {
         std::string newUserPassword;
         int newUserAge;
 
-        std::cout << "Enter new " << newUserRole << " Name: ";
-        std::cin >> newUserName;
+        bool isValidUsername = false;
 
-        std::cout << "Enter new " << newUserRole << " Password: ";
-        std::cin >> newUserPassword;
+        while(!isValidUsername) {
+            std::cout << "Enter new " << newUserRole << " Name: ";
+            std::getline(std::cin, newUserName);
 
+            if(newUserName.length() < 5 || containsSpecialCharacters(newUserName) || hasWhitespace(newUserName)){
+                std::cout << "Usermame is invalid" << "\n";
+                continue;
+            }
+            
+
+            isValidUsername = true; // Assume the username is unique initially
+
+            for(const User& user : users) {
+                if(newUserName == user.getUserName()) { 
+                    std::cout << "Username is already in use, please try again" << '\n';
+                    isValidUsername = false; // Found a duplicate, set isUnique to false
+                    break; // Exit the loop early since we found a duplicate
+                }
+            }
+        }
         
-        newUserPassword = hashPassword(newUserPassword);
+        bool isValidPasswordBool = false ;
+
+        while(!isValidPasswordBool){
+            std::cout << "Enter new " << newUserRole << " Password: ";
+            // fix for getline bugging
+            std::getline(std::cin, newUserPassword);
+            
+            if(newUserPassword.length() < 8 || hasWhitespace(newUserPassword) || !isValidPassword(newUserPassword)){
+                std::cout << "Password is invalid" << "\n";
+                continue;
+            }
+            isValidPasswordBool = true;
+            newUserPassword = hashPassword(newUserPassword);
+
+        }
 
         std::cout << "Enter new " << newUserRole << " Age: ";
         std::cin >> newUserAge;
