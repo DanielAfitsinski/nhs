@@ -124,7 +124,7 @@ class User {
         std::string _role;
         std::string _doctorName;
         std::string _userPassword;
-        Condition _patientCondition;
+        std::vector<Condition> _patientConditions;
 
         // Helper method to find condition by ID
         Condition* findConditionByID(int conditionID) {
@@ -145,7 +145,7 @@ class User {
 
             Condition* condition = findConditionByID(conditionID);
             if (condition != nullptr) {
-                _patientCondition = *condition;
+                _patientConditions.push_back(*condition) ;
             }
         }
 
@@ -164,13 +164,13 @@ class User {
             return _doctorName.empty() ? "N/A" : _doctorName;
         }
 
-        const Condition& getCondition() const { return _patientCondition; }
+        const std::vector<Condition>& getConditions() const { return _patientConditions; }
 
         // Setter method for condition
         void setCondition(int conditionID) {
             Condition* condition = findConditionByID(conditionID);
             if (condition != nullptr) {
-                _patientCondition = *condition;
+                _patientConditions.push_back(*condition);
             }
         }
 
@@ -212,25 +212,27 @@ void displayUserDetails(User& user) { // Displays the passed users details inclu
             << "Doctor: " << user.getDoctorName() << "\n"
             ;
 
-        Condition usersCondition = user.getCondition();
+        std::vector<Condition> usersCondition = user.getConditions();
 
-        std::cout << "\nCondition: " << usersCondition.getCondition() << "\n";
-        if(usersCondition.getCondition() != "Healthy"){
-            std::cout << "Treatment: " << usersCondition.getTreatment() << "\n\n";
-
-
-            usersCondition.displayTreatmentLength();
-            std::cout << "\nFrequency: " << usersCondition.getFrequency() << "\n\n";
-        
-            usersCondition.calculateAndDisplayAvageCosts();
+        for (const auto& condition : usersCondition) {
+            std::cout << "\nCondition: " << condition.getCondition() << "\n";
+            if(condition.getCondition() != "Healthy"){
+                std::cout << "Treatment: " << condition.getTreatment() << "\n\n";
+                condition.displayTreatmentLength();
+                std::cout << "\nFrequency: " << condition.getFrequency() << "\n\n";
+                condition.calculateAndDisplayAvageCosts();
+            }
         }
 
-        
-
-
-        
-
     }
+    
+
+        
+
+
+        
+
+    
  // Function to display all conditions
 void displayConditions() {
 
@@ -263,8 +265,12 @@ void updateUsersCSV() {
             << user.getPassword() << ','
             << user.getAge() << ','
             << user.getRole() << ','
-            << user.getDoctorName() << ','
-            << user.getCondition().getConditionID() << '\n';
+            << user.getDoctorName() << ',';
+
+            for(const auto& condition : user.getConditions()){
+                CSV << condition.getConditionID();
+            }
+            CSV << '\n';
     }
 
     if (CSV.fail()) {  // Check for any errors during writing
@@ -324,6 +330,9 @@ void changePatientsDetails(bool doctorView, int ID) {
             std::cin >> change;
 
             if (change == 'y') {
+
+                
+                
                 clearConsole();
                 for (const auto& condition : conditions) {
                     std::cout << "Condition ID: " << condition.getConditionID() << "\n"
@@ -399,17 +408,23 @@ void calculateAverageAges() {
 
         for (auto& patient : users) {
             if (patient.getRole() == "Patient") {
-                int conditionID = patient.getCondition().getConditionID();
+                int conditionID = 0;
 
-                if (conditionID >= 7 && conditionID <= 9) {
-                    averageSmokingAge += patient.getAge();
-                    smokerCount++;
+                for(const auto& condition : patient.getConditions()){
+                    conditionID = condition.getConditionID();
+
+                    if (conditionID >= 7 && conditionID <= 9) {
+                        averageSmokingAge += patient.getAge();
+                        smokerCount++;
+                    }
+    
+                    if (conditionID >= 3 && conditionID <= 5) {
+                        averageCancerAge += patient.getAge();
+                        cancerCount++;
+                    }
                 }
 
-                if (conditionID >= 3 && conditionID <= 5) {
-                    averageCancerAge += patient.getAge();
-                    cancerCount++;
-                }
+                
             }
         }
 

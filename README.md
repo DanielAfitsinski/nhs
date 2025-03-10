@@ -9,3 +9,6 @@ doctor:
 pharmacist:
     username: pharmacist
     password: SecurePharmacist123?
+nurse:
+    username: nurse
+    password: SecureNurse123?
