@@ -146,13 +146,15 @@ class User {
     public:
         // Constructor
         User(int userID, const std::string& userName, const std::string& role,
-            const std::string& doctorName, const std::string& password, int age, int conditionID)
+            const std::string& doctorName, const std::string& password, int age, std::vector<int> conditionIDs)
             : _userID(userID), _userName(userName), _role(role),
             _doctorName(doctorName), _userPassword(password), _age(age) {
 
-            Condition* condition = findConditionByID(conditionID);
-            if (condition != nullptr) {
-                _patientConditions.push_back(*condition) ;
+            for(int conditionID : conditionIDs){
+                Condition* condition = findConditionByID(conditionID);
+                if (condition != nullptr) {
+                    _patientConditions.push_back(*condition) ;
+                }
             }
         }
 
@@ -298,9 +300,15 @@ void updateUsersCSV() {
             << user.getRole() << ','
             << user.getDoctorName() << ',';
 
-            for(const auto& condition : user.getConditions()){
-                CSV << condition.getConditionID();
-            }
+        CSV << '"';
+        for (size_t i = 0; i < user.getConditions().size(); ++i) {
+            CSV << user.getConditions()[i].getConditionID();
+            // Add a comma if it's not the last condition
+            if (i != user.getConditions().size() - 1) {
+        CSV << ',';
+    }
+}
+CSV << '"';
             CSV << '\n';
     }
 
@@ -490,35 +498,44 @@ void displayStatistics() { // Display general statistics
 
     }
 
-bool importUsers() {
+    bool importUsers() {
         std::ifstream inputtedCSV(USERDETAILS);
-
-        if (!inputtedCSV) { // Check if file opened successfully
+    
+        if (!inputtedCSV) {
             std::cerr << "Error with Login Details File\n";
             return false;
         }
-
+    
         users.clear();  // Clear the existing user list
-
+    
         std::string ID, username, password, age, role, doctorName, condition;
-
+    
         while (std::getline(inputtedCSV, ID, ',') && std::getline(inputtedCSV, username, ',') &&
-            std::getline(inputtedCSV, password, ',') && std::getline(inputtedCSV, age, ',') &&
-            std::getline(inputtedCSV, role, ',') && std::getline(inputtedCSV, doctorName, ',') &&
-            std::getline(inputtedCSV, condition)) {
-
+               std::getline(inputtedCSV, password, ',') && std::getline(inputtedCSV, age, ',') &&
+               std::getline(inputtedCSV, role, ',') && std::getline(inputtedCSV, doctorName, ',') &&
+               std::getline(inputtedCSV, condition)) {
+    
             if (username == "Username") continue;  // Skip header row
-
-            int intCondition = 0;
+    
+            // Remove surrounding double quotes from condition field if they exist
+            if (!condition.empty() && condition.front() == '"' && condition.back() == '"') {
+                condition = condition.substr(1, condition.size() - 2); // Remove first and last character
+            }
+    
+            std::vector<int> conditions;
             if (!condition.empty()) {
-                try {
-                    intCondition = std::stoi(condition);  // Convert condition to int
-                }
-                catch (const std::invalid_argument&) {
-                    continue;  // Skip invalid condition
+                std::stringstream ss(condition);
+                std::string piece;  // "token" replaced with simpler word
+                while (std::getline(ss, piece, ',')) {  // Split by comma
+                    try {
+                        conditions.push_back(std::stoi(piece));  // Convert to int and add
+                    }
+                    catch (const std::invalid_argument&) {
+                        continue;  // Skip invalid condition IDs
+                    }
                 }
             }
-
+    
             // Convert ID and Age to integers
             int intID = 0, intAge = 0;
             try {
@@ -528,11 +545,11 @@ bool importUsers() {
             catch (const std::invalid_argument&) {
                 continue;  // Skip invalid ID or Age
             }
-
-            // Add the user to the list using push_back
-            users.push_back(User(intID, username, role, doctorName, password, intAge, intCondition)); // Hash the password
+    
+            // Add the user to the list
+            users.push_back(User(intID, username, role, doctorName, password, intAge, conditions));
         }
-
+    
         inputtedCSV.close();
         return true;
     }
@@ -591,9 +608,14 @@ void registerNewUser(std::string newUserRole) {
 
         std::string doctorname = "";
         int userID = users.size() + 1;
-        int conditionID = 0;
 
-        users.push_back(User(userID, newUserName, newUserRole, doctorname, newUserPassword,newUserAge,conditionID));
+        std::vector<int> conditions;
+        int conditionID = 0;
+        conditions.push_back(conditionID); // Healthy by default
+        
+        
+
+        users.push_back(User(userID, newUserName, newUserRole, doctorname, newUserPassword,newUserAge,conditions));
         std::cout << "User Successfully Registered";
         updateUsersCSV();
         userContinue();
