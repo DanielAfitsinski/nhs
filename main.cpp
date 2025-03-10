@@ -196,6 +196,7 @@ class User {
         void setDoctorName(const std::string& doctorName) { _doctorName = doctorName; }
         void setPassword(const std::string& password) { _userPassword = password; }
         void setAge(int age) { _age = age; }
+        void setPatientConditions(const std::vector<Condition>& conditions) { _patientConditions = conditions; }
     };
 
 
@@ -364,36 +365,118 @@ void changePatientsDetails(bool doctorView, int ID) {
             User& selectedPatient = user;  // Reference to the selected patient
             displayUserDetails(selectedPatient);
 
-            std::cout << "\nDo you want to change their medical details (y/n): ";
-            char change;
-            std::cin >> change;
+            std::cout << "\n1: Edit Current Conditions\n2: Add New Condition\n3: Exit\n\nPlease select an option: ";
+            int option = 0;
+            std::cin >> option;
 
-            if (change == 'y') {
+            switch(option){
+                case 1:
+                    if(selectedPatient.getConditions().size() == 0){
+                        std::cout << "No Conditions to Edit";
+                        userContinue();
+                        clearConsole();
+                        break;
+                    }
+                    else{
+                        clearConsole();
+                        
+                        std::vector<Condition> usersConditions = user.getConditions();
 
-                
-                
-                clearConsole();
-                for (const auto& condition : conditions) {
-                    std::cout << "Condition ID: " << condition.getConditionID() << "\n"
-                        << "Condition: " << condition.getCondition() << "\n";
-                    condition.displayTreatmentLength();
-                    std::cout << "\n\n";
-                }
+                        for(const auto& condition : usersConditions){
+                            std::cout << "Condition ID: " << condition.getConditionID() << "\n";
+                            std::cout << "Condition: " << condition.getCondition() << "\n";
+                            std::cout << "Treatment: " << condition.getTreatment() << "\n";
+                            condition.displayTreatmentLength();
+                            std::cout << "\n\n";
+                        }
 
-                std::cout << "Enter Condition ID: ";
-                int conditionID;
-                std::cin >> conditionID;
-                selectedPatient.addCondition(conditionID);
+                        std::cout << "Enter Condition ID: ";
+                        int oldConditionID;
+                        std::cin >> oldConditionID;
 
-                updateUsersCSV();
-                std::cout << "Details Successfully Changed";
-                userContinue();
-                clearConsole();
+                        std::cout << "Has this condition been cured: (y/n) ";
+                        char cured;
+                        std::cin >> cured;
+                        if(cured == 'y'){
+                            for(int i = 0; i < usersConditions.size(); i++){
+                                if(usersConditions[i].getConditionID() == oldConditionID){
+                                    usersConditions.erase(usersConditions.begin() + i);
+                                    break;
+                                }
+                            }
+                            selectedPatient.setPatientConditions(usersConditions);
+                            updateUsersCSV();
+                            clearConsole();
+                            std::cout << "Details Successfully Changed";
+                            userContinue();
+                            clearConsole();
+                            break;
+                        }else{
+                            for (const auto& condition : conditions) {
+                                std::cout << "\nCondition ID: " << condition.getConditionID() << "\n"
+                                    << "Condition: " << condition.getCondition() << "\n";
+                                condition.displayTreatmentLength(); 
+                            }
+    
+                            std::cout << "\nEnter New Condition ID: ";
+                            int newConditionID;
+                            std::cin >> newConditionID;
+    
+    
+                            Condition newCondition;
+                            for(auto& condition : conditions){
+                                if(condition.getConditionID() == newConditionID){
+                                    newCondition = condition; 
+                                    break;
+                                }
+                            }
+                            for(int i = 0; i < usersConditions.size(); i++){
+                                if(usersConditions[i].getConditionID() == oldConditionID){
+                                    usersConditions[i] = newCondition;
+                                    break;
+                                }
+                            }
+                            selectedPatient.setPatientConditions(usersConditions);
+    
+                            updateUsersCSV();
+                            clearConsole();
+                            std::cout << "Details Successfully Changed";
+                            userContinue();
+                            clearConsole();
+                        }
+                        
+                        
+                    }
+                    break;
+                case 2:
+                    for (const auto& condition : conditions) {
+                        std::cout << "Condition ID: " << condition.getConditionID() << "\n"
+                            << "Condition: " << condition.getCondition() << "\n";
+                        condition.displayTreatmentLength();
+                        std::cout << "\n\n";
+                    }
+
+                    std::cout << "Enter Condition ID: ";
+                    int conditionID;
+                    std::cin >> conditionID;
+                    selectedPatient.addCondition(conditionID);
+
+                    updateUsersCSV();
+                    clearConsole();
+                    std::cout << "Details Successfully Changed";
+                    userContinue();
+                    clearConsole();
+                    break;
+                case 3:
+                    clearConsole();
+                    break;
+                default:
+                    std::cout << "Invalid Option";
+                    userContinue();
+                    clearConsole();
+                    break;
             }
-            else {
-                userContinue();
-                clearConsole();
-            }
+            
 
             break; // Exit loop after processing the selected patient
         }
