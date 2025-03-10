@@ -492,6 +492,7 @@ bool importUsers() {
     
 
 void registerNewUser(std::string newUserRole) {
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Clear the input buffer
         std::string newUserName; //Get new users details
         std::string newUserPassword;
         int newUserAge;
@@ -614,7 +615,7 @@ void displayMenu() { // Display main menu screen
 
         while (!logout) {
             clearConsole();
-            std::cout << "1: My Details\n2: View or Update My Patients Details (Doctor)\n3: View or Update Any Patients Details (Pharmacist)\n4: View Statistics (Doctor)\n5: Register New Doctor (Doctor)\n6: Register New Pharmacist (Pharmacist)\n7: Logout\n\nPlease select an option: ";
+            std::cout << "1: My Details\n2: View or Update My Patients Details (Doctor)\n3: View or Update Any Patients Details (Pharmacist)\n4: View Statistics (Doctor)\n5: Register New Doctor/Nurse (Doctor/Nurse)\n6: Register New Pharmacist (Pharmacist)\n7: Logout\n\nPlease select an option: ";
             std::cin >> menuOption;
 
             switch (menuOption) {
@@ -642,11 +643,26 @@ void displayMenu() { // Display main menu screen
                 displayStatistics();
                 break;
             case 5:
-                if (loggedRole == "Doctor" || loggedRole == "Pharmacist") {
-                    registerNewUser("Doctor");
+                if (loggedRole == "Doctor" || loggedRole == "Pharmacist" || loggedRole == "Nurse") {
+                    std::cout << "What role are you registering: " << '\n';
+                    std::cout << "1: Doctor\n2: Nurse\n";
+                    
+                    int newRole = 0;
+                    std::cin >> newRole;
+
+                    if(newRole == 1){
+                        registerNewUser("Doctor");
+                    }
+                    else if(newRole == 2){
+                        registerNewUser("Nurse");
+                    }
+                    else{
+                        showAccessDenied("Invalid Role");
+                    }
+                    
                 }
                 else {
-                    showAccessDenied("Only Doctors or Pharmacists Can Register New Doctors.");
+                    showAccessDenied("Only Doctors, Nurses or Pharmacists Can Register a New Doctor/Nurse.");
                 }
                 break;
             case 6:
