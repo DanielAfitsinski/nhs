@@ -90,23 +90,30 @@ public:
 
 
     // Calculate and display the average cost of the condition
-    void calculateAndDisplayAvageCosts() const {
+    std::vector<double> calculateCost() const {
+
+        std::vector<double> costs;; 
 
         if(_dailyCost != 0.0){
             
-            double monthlyCost = (_dailyCost * 365) / 12; // Most accurage way to calculate monthly cost
+            double monthlyCost = (_dailyCost * 365) / 12; // Most accurate way to calculate monthly cost
             double yearlyCost = _dailyCost * 365;
             double weeklyCost = _dailyCost * 7;
     
-            std::cout << "Daily Cost: £" << _dailyCost
-             << "\nWeekly Cost: £" << weeklyCost
-             << "\nMonthly Cost: £" << monthlyCost
-             << "\nYearly Cost: £" << yearlyCost << std::endl;
+            costs.push_back(_dailyCost);
+            costs.push_back(weeklyCost); // have to do this way instead of costs = {dailyCost, weeklyCost, monthlyCost, yearlyCost} because of my compiler on mac
+            costs.push_back(monthlyCost);
+            costs.push_back(yearlyCost);
         }
         else{
-            std::cout << "No Cost";
+            costs.push_back(0.0);
+            costs.push_back(0.0);// have to do this way instead of costs = {dailyCost, weeklyCost, monthlyCost, yearlyCost} because of my compiler on mac
+            costs.push_back(0.0);
+            costs.push_back(0.0);
+
         }
 
+        return costs;
     }
 };
 
@@ -167,9 +174,16 @@ class User {
         const std::vector<Condition>& getConditions() const { return _patientConditions; }
 
         // Setter method for condition
-        void setCondition(int conditionID) {
+        void addCondition(int conditionID) {
             Condition* condition = findConditionByID(conditionID);
             if (condition != nullptr) {
+                if(_patientConditions.size() == 1){
+                    if(_patientConditions[0].getConditionID() == 0){
+                        _patientConditions.clear(); // Removes healthy status
+                        _patientConditions.shrink_to_fit();
+                    }
+                }
+                
                 _patientConditions.push_back(*condition);
             }
         }
@@ -212,16 +226,33 @@ void displayUserDetails(User& user) { // Displays the passed users details inclu
             << "Doctor: " << user.getDoctorName() << "\n"
             ;
 
-        std::vector<Condition> usersCondition = user.getConditions();
+        std::vector<Condition> usersConditions = user.getConditions();
 
-        for (const auto& condition : usersCondition) {
-            std::cout << "\nCondition: " << condition.getCondition() << "\n";
-            if(condition.getCondition() != "Healthy"){
-                std::cout << "Treatment: " << condition.getTreatment() << "\n\n";
-                condition.displayTreatmentLength();
-                std::cout << "\nFrequency: " << condition.getFrequency() << "\n\n";
-                condition.calculateAndDisplayAvageCosts();
+        if(!(usersConditions.size() == 0 || (usersConditions.size() == 1 && usersConditions[0].getConditionID() == 0))){
+            double dailyCost = 0.0;
+            double weeklyCost = 0.0;
+            double monthlyCost = 0.0;
+            double yearlyCost = 0.0;
+
+            for (const auto& condition : usersConditions) {
+                std::cout << "\nCondition: " << condition.getCondition() << "\n";
+                if(condition.getCondition() != "Healthy"){
+                    std::cout << "Treatment: " << condition.getTreatment() << "\n\n";
+                    condition.displayTreatmentLength();
+                    std::cout << "\nFrequency: " << condition.getFrequency() << "\n\n";
+                    std::vector<double> costs = condition.calculateCost();
+                    dailyCost += costs[0];
+                    weeklyCost += costs[1];
+                    monthlyCost += costs[2];
+                    yearlyCost += costs[3];
+                }
             }
+
+            std::cout << "\n\nTotal Costs: \n";
+            std::cout << "Daily Cost: " << dailyCost << "\n";
+            std::cout << "Weekly Cost: " << weeklyCost << "\n";
+            std::cout << "Monthly Cost: " << monthlyCost << "\n";
+            std::cout << "Yearly Cost: " << yearlyCost << "\n";
         }
 
     }
@@ -344,7 +375,7 @@ void changePatientsDetails(bool doctorView, int ID) {
                 std::cout << "Enter Condition ID: ";
                 int conditionID;
                 std::cin >> conditionID;
-                selectedPatient.setCondition(conditionID);
+                selectedPatient.addCondition(conditionID);
 
                 updateUsersCSV();
                 std::cout << "Details Successfully Changed";
@@ -438,7 +469,11 @@ void calculateCostForEveryCondition(){
             std::cout << "\n\nCondition: " << condition.getCondition() << "\n" << "Treatment: " << condition.getTreatment() << "\n";
             condition.displayTreatmentLength();
             std::cout << "\n";
-            condition.calculateAndDisplayAvageCosts();
+            std::vector<double> costs = condition.calculateCost();
+            std::cout << "Daily Cost: " << condition.calculateCost()[0] << "\n";
+            std::cout << "Weekly Cost: " << condition.calculateCost()[1] << "\n";
+            std::cout << "Monthly Cost: " << condition.calculateCost()[2] << "\n";
+            std::cout << "Yearly Cost: " << condition.calculateCost()[3] << "\n";
         }
     }
 
