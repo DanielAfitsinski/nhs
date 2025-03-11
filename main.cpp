@@ -202,6 +202,24 @@ class User {
             }
         }
 
+        bool hasCondition(int conditionID) const {
+            for (const auto& condition : _patientConditions) {
+                if (condition.getConditionID() == conditionID) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        bool doesChemotherapy() const {
+            for (const auto& condition : _patientConditions) {
+                if (condition.getConditionID() == 3 || condition.getConditionID() == 4) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         // Setter methods (grouped)
         void setUserName(const std::string& name) { _userName = name; }
         void setRole(const std::string& role) { _role = role; }
@@ -417,7 +435,7 @@ void changePatientsDetails(bool doctorView, int ID) {
                         char cured;
                         std::cin >> cured;
                         if(cured == 'y'){
-                            user.removeCondition(oldConditionID);
+                            selectedPatient.removeCondition(oldConditionID);
                             updateUsersCSV();
                             clearConsole();
                             std::cout << "Details Successfully Changed";
@@ -435,21 +453,8 @@ void changePatientsDetails(bool doctorView, int ID) {
                             int newConditionID;
                             std::cin >> newConditionID;
     
-                        
-                            Condition newCondition;
-                            for(auto& condition : conditions){
-                                if(condition.getConditionID() == newConditionID){
-                                    newCondition = condition; 
-                                    break;
-                                }
-                            }
-                            for(int i = 0; i < usersConditions.size(); i++){
-                                if(usersConditions[i].getConditionID() == oldConditionID){
-                                    usersConditions[i] = newCondition;
-                                    break;
-                                }
-                            }
-                            selectedPatient.setPatientConditions(usersConditions);
+                            selectedPatient.removeCondition(oldConditionID);
+                            selectedPatient.addCondition(newConditionID);
     
                             updateUsersCSV();
                             clearConsole();
@@ -472,7 +477,25 @@ void changePatientsDetails(bool doctorView, int ID) {
                     std::cout << "Enter Condition ID: ";
                     int conditionID;
                     std::cin >> conditionID;
-                    selectedPatient.addCondition(conditionID);
+                    
+                    if(selectedPatient.hasCondition(conditionID)){
+                        clearConsole();
+                        std::cout << "Patient already has this condition";
+                        userContinue();
+                        clearConsole();
+                        break;
+                    }else if(selectedPatient.doesChemotherapy()){
+                        clearConsole();
+                        std::cout << "Cannot combine Chemotherapy with other conditions";
+                        userContinue();
+                        clearConsole();
+                        break;
+                    }
+                    
+                    else{
+                        selectedPatient.addCondition(conditionID);
+                    }
+
 
                     updateUsersCSV();
                     clearConsole();
