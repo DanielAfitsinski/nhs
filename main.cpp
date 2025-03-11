@@ -185,18 +185,20 @@ class User {
 
         const std::vector<Condition>& getConditions() const { return _patientConditions; }
 
-        // Setter method for condition
         void addCondition(int conditionID) {
             Condition* condition = findConditionByID(conditionID);
             if (condition != nullptr) {
-                if(_patientConditions.size() == 1){
-                    if(_patientConditions[0].getConditionID() == 0){
-                        _patientConditions.clear(); // Removes healthy status
-                        _patientConditions.shrink_to_fit();
-                    }
-                }
-                
                 _patientConditions.push_back(*condition);
+            }
+        }
+
+        void removeCondition(int conditionID) {
+            for (auto it = _patientConditions.begin(); it != _patientConditions.end(); ) {
+                if (it->getConditionID() == conditionID) {
+                    it = _patientConditions.erase(it); // Removes and updates iterator
+                } else {
+                    ++it;
+                }
             }
         }
 
@@ -382,7 +384,7 @@ void changePatientsDetails(bool doctorView, int ID) {
             switch(option){
                 case 1:
                     if(selectedPatient.getConditions().size() == 0){
-                        std::cout << "No Conditions to Edit";
+                        std::cout << "Patient is healthy";
                         userContinue();
                         clearConsole();
                         break;
@@ -392,12 +394,19 @@ void changePatientsDetails(bool doctorView, int ID) {
                         
                         std::vector<Condition> usersConditions = user.getConditions();
 
-                        for(const auto& condition : usersConditions){
-                            std::cout << "Condition ID: " << condition.getConditionID() << "\n";
-                            std::cout << "Condition: " << condition.getCondition() << "\n";
-                            std::cout << "Treatment: " << condition.getTreatment() << "\n";
-                            condition.displayTreatmentLength();
-                            std::cout << "\n\n";
+                        if(usersConditions.size() == 0){
+                            std::cout << "Patient is healthy";
+                            userContinue();
+                            clearConsole();
+                            break;
+                        }else{
+                            for(const auto& condition : usersConditions){
+                                std::cout << "Condition ID: " << condition.getConditionID() << "\n";
+                                std::cout << "Condition: " << condition.getCondition() << "\n";
+                                std::cout << "Treatment: " << condition.getTreatment() << "\n";
+                                condition.displayTreatmentLength();
+                                std::cout << "\n\n";
+                            }
                         }
 
                         std::cout << "Enter Condition ID: ";
@@ -408,13 +417,7 @@ void changePatientsDetails(bool doctorView, int ID) {
                         char cured;
                         std::cin >> cured;
                         if(cured == 'y'){
-                            for(int i = 0; i < usersConditions.size(); i++){
-                                if(usersConditions[i].getConditionID() == oldConditionID){
-                                    usersConditions.erase(usersConditions.begin() + i);
-                                    break;
-                                }
-                            }
-                            selectedPatient.setPatientConditions(usersConditions);
+                            user.removeCondition(oldConditionID);
                             updateUsersCSV();
                             clearConsole();
                             std::cout << "Details Successfully Changed";
@@ -432,7 +435,7 @@ void changePatientsDetails(bool doctorView, int ID) {
                             int newConditionID;
                             std::cin >> newConditionID;
     
-    
+                        
                             Condition newCondition;
                             for(auto& condition : conditions){
                                 if(condition.getConditionID() == newConditionID){
@@ -809,8 +812,8 @@ void displayMenu() { // Display main menu screen
                 break;
             case 5:
                 if (loggedRole == "Doctor" || loggedRole == "Pharmacist" || loggedRole == "Nurse") {
-                    std::cout << "What role are you registering: " << '\n';
-                    std::cout << "1: Doctor\n2: Nurse\n";
+                    std::cout << "Which role are you registering: " << '\n';
+                    std::cout << "1: Doctor\n2: Nurse\n3:Exit";
                     
                     int newRole = 0;
                     std::cin >> newRole;
@@ -820,6 +823,9 @@ void displayMenu() { // Display main menu screen
                     }
                     else if(newRole == 2){
                         registerNewUser("Nurse");
+                    }
+                    else if(newRole == 3){
+                        break;
                     }
                     else{
                         showAccessDenied("Invalid Role");

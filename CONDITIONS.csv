@@ -1,5 +1,4 @@
 ID,Condition,Treatment,Frequency,Cost,Treatment Length
-0,,,N/A,0,N/A
 1,Diabetes (type 1),Insulin,2 shots a day,15.02,N/A
 2,Diabetes (type 2),Insulin,1 shot a day,7.52,N/A
 3,Lung Cancer (stage 1),Chemotherapy,One round every 4 weeks,357.14,6
