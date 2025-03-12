@@ -7,11 +7,8 @@
 
 
 //TODO - Assign Nurses To Patients
-//TODO - Allow Doctors To Assign Themselves To Patients With No Doctors
-//TODO - Allow Patients To Have Multiple Doctors/Nurses
 //TODO - Fix Logic For Empty PatientsConditions Vector vs Having A 0 For Healthy Condition
 //TODO - Validation
-//TODO - Add Logic To Statistic To Check Frequency Of Smokers + Cancer Patients
 //TODO - Add Patient History Of Smoking / Cancer / Diabetes ??
 
 
@@ -139,6 +136,7 @@ class User {
         std::string _userName;
         std::string _role;
         std::string _doctorName;
+        std::string _nurseName;
         std::string _userPassword;
         std::vector<Condition> _patientConditions;
 
@@ -155,9 +153,9 @@ class User {
     public:
         // Constructor
         User(int userID, const std::string& userName, const std::string& role,
-            const std::string& doctorName, const std::string& password, int age, std::vector<int> conditionIDs)
+            const std::string& doctorName, const std::string& nurseName, const std::string& password, int age, std::vector<int> conditionIDs)
             : _userID(userID), _userName(userName), _role(role),
-            _doctorName(doctorName), _userPassword(password), _age(age) {
+            _doctorName(doctorName), _nurseName(nurseName), _userPassword(password), _age(age) {
 
             for(int conditionID : conditionIDs){
                 Condition* condition = findConditionByID(conditionID);
@@ -168,7 +166,7 @@ class User {
         }
 
         // Default Constructor
-        User() : _userID(0), _userName(""), _role(""), _doctorName(""), _userPassword(""), _age(0) {}
+        User() : _userID(0), _userName(""), _role(""), _doctorName(""),_nurseName(""), _userPassword(""), _age(0) {}
 
         // Getters
         int getUserID() const { return _userID; }
@@ -180,6 +178,10 @@ class User {
         // Return the doctor's name or "N/A" if it's not set
         std::string getDoctorName() const {
             return _doctorName.empty() ? "N/A" : _doctorName;
+        }
+
+        std::string getNurseName() const {
+            return _nurseName.empty() ? "N/A" : _nurseName;
         }
 
         const std::vector<Condition>& getConditions() const { return _patientConditions; }
@@ -223,6 +225,7 @@ class User {
         void setUserName(const std::string& name) { _userName = name; }
         void setRole(const std::string& role) { _role = role; }
         void setDoctorName(const std::string& doctorName) { _doctorName = doctorName; }
+        void setNurseName(const std::string& nurseName) { _nurseName = nurseName; }
         void setPassword(const std::string& password) { _userPassword = password; }
         void setAge(int age) { _age = age; }
         void setPatientConditions(const std::vector<Condition>& conditions) { _patientConditions = conditions; }
@@ -254,7 +257,7 @@ void displayUserDetails(User& user) { // Displays the passed users details inclu
         std::cout << "Role: " << user.getRole() << "\n"
             << "User: " << user.getUserName() << "\n"
             << "Age: " << user.getAge() << "\n"
-            << "Doctor: " << user.getDoctorName() << "\n"
+            << "Doctor: " << user.getDoctorName() << "\nNurse: " << user.getNurseName() << "\n"
             ;
 
         std::vector<Condition> usersConditions = user.getConditions();
@@ -318,7 +321,7 @@ void updateUsersCSV() {
     }
 
     // Writing header at once
-    CSV << "ID,Username,Password,Age,Role,DoctorName,ConditionID\n";
+    CSV << "ID,Username,Password,Age,Role,DoctorName,NurseName,ConditionID\n";
 
     for (const auto& user : users) {  
 
@@ -327,7 +330,8 @@ void updateUsersCSV() {
             << user.getPassword() << ','
             << user.getAge() << ','
             << user.getRole() << ','
-            << user.getDoctorName() << ',';
+            << user.getDoctorName() << ','
+            << user.getNurseName() << ',';
 
         CSV << '"';
         for (size_t i = 0; i < user.getConditions().size(); ++i) {
@@ -591,8 +595,6 @@ void calculateAverageAges() {
                         smokeAndCancerCount++;
                     }
                 }
-
-                
             }
         }
 
@@ -638,14 +640,14 @@ void displayStatistics() { // Display general statistics
     
         users.clear();  // Clear the existing user list
     
-        std::string ID, username, password, age, role, doctorName, condition;
+        std::string ID, username, password, age, role, doctorName, nurseName, condition;
     
         while (std::getline(inputtedCSV, ID, ',') && std::getline(inputtedCSV, username, ',') &&
                std::getline(inputtedCSV, password, ',') && std::getline(inputtedCSV, age, ',') &&
-               std::getline(inputtedCSV, role, ',') && std::getline(inputtedCSV, doctorName, ',') &&
-               std::getline(inputtedCSV, condition)) {
+               std::getline(inputtedCSV, role, ',') && std::getline(inputtedCSV, doctorName, ',') && 
+               std::getline(inputtedCSV, doctorName, ',') && std::getline(inputtedCSV, condition)) {
     
-            if (username == "Username") continue;  // Skip header row
+            if (ID == "ID") continue;  // Skip header row
     
             // Remove surrounding double quotes from condition field if they exist
             if (!condition.empty() && condition.front() == '"' && condition.back() == '"') {
@@ -653,18 +655,18 @@ void displayStatistics() { // Display general statistics
             }
     
             std::vector<int> conditions;
-            if (!condition.empty()) {
-                std::stringstream ss(condition);
-                std::string piece;  // "token" replaced with simpler word
-                while (std::getline(ss, piece, ',')) {  // Split by comma
-                    try {
-                        conditions.push_back(std::stoi(piece));  // Convert to int and add
-                    }
-                    catch (const std::invalid_argument&) {
-                        continue;  // Skip invalid condition IDs
-                    }
+  
+            std::stringstream ss(condition);
+            std::string piece;  
+            while (std::getline(ss, piece, ',')) {  // Split by comma
+            try {
+                conditions.push_back(std::stoi(piece));  // Convert to int and add
+                }
+            catch (const std::invalid_argument&) {
+                continue;  // Skip invalid condition IDs
                 }
             }
+            
     
             // Convert ID and Age to integers
             int intID = 0, intAge = 0;
@@ -677,7 +679,7 @@ void displayStatistics() { // Display general statistics
             }
     
             // Add the user to the list
-            users.push_back(User(intID, username, role, doctorName, password, intAge, conditions));
+            users.push_back(User(intID, username, role, doctorName,nurseName, password, intAge, conditions));
         }
     
         inputtedCSV.close();
@@ -737,6 +739,7 @@ void registerNewUser(std::string newUserRole) {
         std::cin >> newUserAge;
 
         std::string doctorname = "";
+        std::string nurseName = "";
         int userID = users.size() + 1;
 
         std::vector<int> conditions;
@@ -745,7 +748,7 @@ void registerNewUser(std::string newUserRole) {
         
         
 
-        users.push_back(User(userID, newUserName, newUserRole, doctorname, newUserPassword,newUserAge,conditions));
+        users.push_back(User(userID, newUserName, newUserRole, doctorname,nurseName, newUserPassword,newUserAge,conditions));
         std::cout << "User Successfully Registered";
         updateUsersCSV();
         userContinue();
