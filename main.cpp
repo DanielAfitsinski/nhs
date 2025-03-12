@@ -564,7 +564,13 @@ void calculateAverageAges() {
         int averageCancerAge = 0;
         int cancerCount = 0;
 
+        int smokeAndCancerCount = 0;
+
         for (auto& patient : users) {
+
+            bool smoker = false;
+            bool cancer = false;
+
             if (patient.getRole() == "Patient") {
                 int conditionID = 0;
 
@@ -574,11 +580,16 @@ void calculateAverageAges() {
                     if (conditionID >= 7 && conditionID <= 9) {
                         averageSmokingAge += patient.getAge();
                         smokerCount++;
+                        smoker = true;
                     }
     
                     if (conditionID >= 3 && conditionID <= 5) {
                         averageCancerAge += patient.getAge();
                         cancerCount++;
+                        cancer = true;
+                    }
+                    if(smoker && cancer){
+                        smokeAndCancerCount++;
                     }
                 }
 
@@ -588,6 +599,7 @@ void calculateAverageAges() {
 
         std::cout << "Average Smoking Age: " << (smokerCount == 0 ? "N/A" : std::to_string(averageSmokingAge / smokerCount)) << std::endl; // Check if there are any smokers before calculating the average
         std::cout << "Average Cancer Age: " << (cancerCount == 0 ? "N/A" : std::to_string(averageCancerAge / cancerCount)) << std::endl; // Check if there is any one with Cancer before calculating the average
+        std::cout << "Number of Patients with Cancer and Smoke: " << smokeAndCancerCount << std::endl;
     }
 
 
@@ -611,7 +623,7 @@ void displayStatistics() { // Display general statistics
 
         calculateAverageAges();
         std::cout << "\n";
-        calculateCostForEveryCondition();
+        //calculateCostForEveryCondition();
        
         userContinue();
 
