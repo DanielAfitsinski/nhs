@@ -235,7 +235,6 @@ class User {
     std::vector<User> users; // Vector containing all users
 
 
-
 // Function to hash passwords using SHA-256
 std::string hashPassword(const std::string& password) {
     unsigned char hash[SHA256_DIGEST_LENGTH];
@@ -807,6 +806,36 @@ void showAccessDenied(const std::string& message) {
         userContinue();
     }
 
+
+void assignPatientToDoctor(){
+    clearConsole();
+    std::cout << "Patients that currently do not have a doctor assigned to them:\n\n";
+
+    for(auto& user : users){
+        if(user.getRole() == "Patient" && user.getDoctorName() == "N/A"){
+            std::cout << "ID: " << user.getUserID() << " User: " << user.getUserName() << "\n";
+        }
+    }
+
+    std::cout << "\nEnter Patient ID(0 to cancel): ";
+    int patientID = 0;
+    std::cin >> patientID;
+
+    if(patientID != 0){
+        for(auto& user : users){
+            if(user.getUserID() == patientID){
+                user.setDoctorName(loggedUser.getUserName());
+                updateUsersCSV();
+                clearConsole();
+                std::cout << "Patient Successfully Assigned";
+                break;
+            }
+        }
+    }
+
+    userContinue();
+}
+
 void displayMenu() { // Display main menu screen
         clearConsole();
 
@@ -818,7 +847,7 @@ void displayMenu() { // Display main menu screen
 
         while (!logout) {
             clearConsole();
-            std::cout << "1: My Details\n2: View or Update My Patients Details (Doctor)\n3: View or Update Any Patients Details (Pharmacist)\n4: View Statistics (Doctor)\n5: Register New Doctor/Nurse (Doctor/Nurse)\n6: Register New Pharmacist (Pharmacist)\n7: Logout\n\nPlease select an option: ";
+            std::cout << "1: My Details\n2: View or Update My Patients Details (Doctor)\n3: View or Update Any Patients Details (Pharmacist)\n4: View Statistics (Doctor)\n5: Register New Doctor/Nurse (Doctor/Nurse)\n6: Register New Pharmacist (Pharmacist)\n7: Assign Patients\n8: Logout\n\nPlease select an option: ";
             std::cin >> menuOption;
 
             switch (menuOption) {
@@ -880,6 +909,15 @@ void displayMenu() { // Display main menu screen
                 }
                 break;
             case 7:
+                if (loggedRole == "Doctor") {
+                    assignPatientToDoctor();
+                }
+                else {
+                    showAccessDenied("Only Doctors Can Assign Patients.");
+                }
+                
+                break;
+            case 8:
                 logout = true;
                 break;
             default:

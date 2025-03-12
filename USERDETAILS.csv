@@ -4,4 +4,5 @@ ID,Username,Password,Age,Role,DoctorName,ConditionID
 3,pharmacist,0ff9940f6f5f715406a31c4dccc52f01c84abdec6a363d34594dda2a766838c9,60,Pharmacist,N/A,""
 4,nurse,e51a46487b4fbaf12aef8711abb2a23b2250753d96c55365b0a266e2e51b7bc2,33,Nurse,N/A,""
 5,Patient1,d0daddbfaf25fa2d890203bfbb221d6ebf2addcb41972578b126f83991d14a3f,40,Patient,doctor,""
-6,ZaccGeorge,929504b255d43d23594f982c1f539e717e35c7e61dfcad4e4d2ecb563aebfa80,70,Patient,N/A,""
+6,ZaccGeorge,929504b255d43d23594f982c1f539e717e35c7e61dfcad4e4d2ecb563aebfa80,70,Patient,doctor,""
+7,testAssign,f04646c4288b4ed569a87b1cb636ad92893cbe7497f22439be319c51471e433c,60,Patient,doctor,""
