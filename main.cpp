@@ -11,7 +11,6 @@
 //TODO - Allow Patients To Have Multiple Doctors/Nurses
 //TODO - Fix Logic For Empty PatientsConditions Vector vs Having A 0 For Healthy Condition
 //TODO - Validation
-//TODO - Not Allow Anyone Doing Chemotherapy To Have Other Conditions/Treatments
 //TODO - Add Logic To Statistic To Check Frequency Of Smokers + Cancer Patients
 //TODO - Add Patient History Of Smoking / Cancer / Diabetes ??
 
@@ -402,9 +401,9 @@ void changePatientsDetails(bool doctorView, int ID) {
             switch(option){
                 case 1:
                     if(selectedPatient.getConditions().size() == 0){
+                        clearConsole();
                         std::cout << "Patient is healthy";
                         userContinue();
-                        clearConsole();
                         break;
                     }
                     else{
@@ -467,42 +466,43 @@ void changePatientsDetails(bool doctorView, int ID) {
                     }
                     break;
                 case 2:
-                    for (const auto& condition : conditions) {
-                        std::cout << "Condition ID: " << condition.getConditionID() << "\n"
-                            << "Condition: " << condition.getCondition() << "\n";
-                        condition.displayTreatmentLength();
-                        std::cout << "\n\n";
-                    }
 
-                    std::cout << "Enter Condition ID: ";
-                    int conditionID;
-                    std::cin >> conditionID;
-                    
-                    if(selectedPatient.hasCondition(conditionID)){
+                    if(selectedPatient.doesChemotherapy()){
                         clearConsole();
-                        std::cout << "Patient already has this condition";
+                        std::cout << "Cannot combine Chemotherapy with other treatments";
                         userContinue();
                         clearConsole();
                         break;
-                    }else if(selectedPatient.doesChemotherapy()){
+                    }else{
+                        for (const auto& condition : conditions) {
+                            std::cout << "Condition ID: " << condition.getConditionID() << "\n"
+                                << "Condition: " << condition.getCondition() << "\n";
+                            condition.displayTreatmentLength();
+                            std::cout << "\n\n";
+                        }
+    
+                        std::cout << "Enter Condition ID: ";
+                        int conditionID;
+                        std::cin >> conditionID;
+                        
+                        if(selectedPatient.hasCondition(conditionID)){
+                            clearConsole();
+                            std::cout << "Patient already has this condition";
+                            userContinue();
+                            clearConsole();
+                            break;
+                        }
+                        else{
+                            selectedPatient.addCondition(conditionID);
+                        }
+    
+                        updateUsersCSV();
                         clearConsole();
-                        std::cout << "Cannot combine Chemotherapy with other conditions";
+                        std::cout << "Details Successfully Changed";
                         userContinue();
                         clearConsole();
                         break;
                     }
-                    
-                    else{
-                        selectedPatient.addCondition(conditionID);
-                    }
-
-
-                    updateUsersCSV();
-                    clearConsole();
-                    std::cout << "Details Successfully Changed";
-                    userContinue();
-                    clearConsole();
-                    break;
                 case 3:
                     clearConsole();
                     break;
