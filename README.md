@@ -1,3 +1,6 @@
+Line 823 - delimeter of \r is what worked for me when compiling on mac, if you run into issues maybe change it to \n
+
+
 Login details:
 
 patient:

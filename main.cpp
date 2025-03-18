@@ -21,7 +21,7 @@ void userContinue() { // UX function to allow the user to continue when they're 
     std::cin.get();
 }
 
-class Condition {
+class Condition { // Class to store the details of a condition
 private:
     int _conditionID;
     std::string _condition;
@@ -71,7 +71,7 @@ public:
             else if (_treatmentLength == 999) {
                 std::cout << "Forever";
             }
-            else {
+            else { // Calculate years and months
                 int years = _treatmentLength / 12;
                 int months = _treatmentLength % 12;
                 if (years > 0) {
@@ -152,6 +152,7 @@ class User {
             : _userID(userID), _userName(userName), _role(role),
             _doctorName(doctorName), _nurseName(nurseName), _userPassword(password), _age(age) {
 
+            // Add conditions to the user
             for(int conditionID : conditionIDs){
                 Condition* condition = findConditionByID(conditionID);
                 if (condition != nullptr) {
@@ -174,20 +175,22 @@ class User {
         std::string getDoctorName() const {
             return _doctorName.empty() ? "N/A" : _doctorName;
         }
-
+        // Return the nurse's name or "N/A" if it's not set
         std::string getNurseName() const {
             return _nurseName.empty() ? "N/A" : _nurseName;
         }
 
         const std::vector<Condition>& getConditions() const { return _patientConditions; }
 
-        void addCondition(int conditionID) {
+        // Add a condition to the user
+        void addCondition(int conditionID) { 
             Condition* condition = findConditionByID(conditionID);
             if (condition != nullptr) {
                 _patientConditions.push_back(*condition);
             }
         }
 
+        // Remove a condition from the user
         void removeCondition(int conditionID) {
             for (auto it = _patientConditions.begin(); it != _patientConditions.end(); ) {
                 if (it->getConditionID() == conditionID) {
@@ -198,6 +201,7 @@ class User {
             }
         }
 
+        // Check if the user has a specific condition
         bool hasCondition(int conditionID) const {
             for (const auto& condition : _patientConditions) {
                 if (condition.getConditionID() == conditionID) {
@@ -207,6 +211,7 @@ class User {
             return false;
         }
 
+        // Check if the user has a condition that requires chemotherapy
         bool doesChemotherapy() const {
             for (const auto& condition : _patientConditions) {
                 if (condition.getConditionID() == 3 || condition.getConditionID() == 4) {
@@ -216,7 +221,7 @@ class User {
             return false;
         }
 
-        // Setter methods (grouped)
+        // Setter methods
         void setUserName(const std::string& name) { _userName = name; }
         void setRole(const std::string& role) { _role = role; }
         void setDoctorName(const std::string& doctorName) { _doctorName = doctorName; }
@@ -263,6 +268,7 @@ void displayUserDetails(User& user) { // Displays the passed users details inclu
             double monthlyCost = 0.0;
             double yearlyCost = 0.0;
 
+            // Display all conditions and treatments
             for (const auto& condition : usersConditions) {
                 std::cout << "\nCondition: " << condition.getCondition() << "\n";
                 if(condition.getCondition() != "Healthy"){
@@ -277,6 +283,7 @@ void displayUserDetails(User& user) { // Displays the passed users details inclu
                 }
             }
 
+            // Display total costs
             std::cout << "\n\nTotal Costs: \n";
             std::cout << "Daily Cost: " << dailyCost << "\n";
             std::cout << "Weekly Cost: " << weeklyCost << "\n";
@@ -298,6 +305,7 @@ void displayConditions() {
 
         clearConsole();
 
+        // Display all conditions
         for (const auto& condition : conditions) {
             std::cout << "Condition ID: " << condition.getConditionID() << "\n"
                 << "Condition: " << condition.getCondition() << "\n";
@@ -307,6 +315,7 @@ void displayConditions() {
         userContinue();
     }
 
+    // Function to update the USERDETAILS CSV file
 void updateUsersCSV() {
     std::ofstream CSV(USERDETAILS); // Open USERDETAILS CSV
 
@@ -319,7 +328,7 @@ void updateUsersCSV() {
     CSV << "ID,Username,Password,Age,Role,DoctorName,NurseName,ConditionID\n";
 
     for (const auto& user : users) {  
-
+        // Write each user's details to the file
         CSV << user.getUserID() << ','
             << user.getUserName() << ','
             << user.getPassword() << ','
@@ -328,8 +337,9 @@ void updateUsersCSV() {
             << user.getDoctorName() << ','
             << user.getNurseName() << ',';
 
+            // Write the conditions as a single string
         CSV << '"';
-        for (size_t i = 0; i < user.getConditions().size(); ++i) {
+        for (size_t i = 0; i < user.getConditions().size(); ++i) { //
             CSV << user.getConditions()[i].getConditionID();
             // Add a comma if it's not the last condition
             if (i != user.getConditions().size() - 1) {
@@ -346,10 +356,12 @@ CSV << '"';
     }
 }
 
+// Function to assign a patient to a nurse
 void assignPatientToNurse(){
     clearConsole();
     std::cout << "Patients that currently do not have a nurse assigned to them:\n\n";
 
+    // Display all patients without a nurse
     for(auto& user : users){
         if(user.getRole() == "Patient" && user.getNurseName() == "N/A"){
             std::cout << "ID: " << user.getUserID() << " User: " << user.getUserName() << "\n";
@@ -375,6 +387,7 @@ void assignPatientToNurse(){
     userContinue();
 }
 
+// Function to check if a string contains any whitespace
 bool isValidPassword(const std::string& password) {
     bool hasLower = false;
     bool hasUpper = false;
@@ -398,6 +411,7 @@ bool hasWhitespace(const std::string& str) {
     return std::any_of(str.begin(), str.end(), ::isspace);
 }
 
+// Function to check if a string contains any special characters
 bool containsSpecialCharacters(const std::string& username) {
     for (char ch : username) {
         if (!std::isalnum(ch) && ch != '_') {
@@ -412,7 +426,7 @@ bool containsSpecialCharacters(const std::string& username) {
 void changePatientsDetails(bool doctorView, int ID) {
     clearConsole();
 
-   
+   // Loop through all users to find the selected patient
     for (auto& user : users) {
         if (user.getUserID() == ID && (!doctorView || user.getDoctorName() == loggedUser.getUserName())) {
             clearConsole();
@@ -424,7 +438,9 @@ void changePatientsDetails(bool doctorView, int ID) {
             int option = 0;
             std::cin >> option;
 
+            // Process the selected option
             switch(option){
+                // Edit Current Conditions
                 case 1:
                     if(selectedPatient.getConditions().size() == 0){
                         clearConsole();
@@ -491,6 +507,7 @@ void changePatientsDetails(bool doctorView, int ID) {
                         
                     }
                     break;
+                    // Add New Condition
                 case 2:
 
                     if(selectedPatient.doesChemotherapy()){
@@ -529,9 +546,11 @@ void changePatientsDetails(bool doctorView, int ID) {
                         clearConsole();
                         break;
                     }
+                    // Exit
                 case 3:
                     clearConsole();
                     break;
+                    // Invalid Option
                 default:
                     std::cout << "Invalid Option";
                     userContinue();
@@ -554,7 +573,7 @@ void accessPatientsDetails(bool doctorView) {
         bool done = false;
 
         while (!done) {
-
+            
             if (doctorView) {
                 std::cout << "Your Patients: \n\n";
 
@@ -573,9 +592,7 @@ void accessPatientsDetails(bool doctorView) {
             std::cin >> response;
 
             if (response != 0) {
-
                 changePatientsDetails(doctorView, response);
-
             }
             else {
                 done = true;
@@ -603,17 +620,20 @@ void calculateAverageAges() {
                 for(const auto& condition : patient.getConditions()){
                     conditionID = condition.getConditionID();
 
+                    // Check if the patient is a smoker
                     if (conditionID >= 7 && conditionID <= 9) {
                         averageSmokingAge += patient.getAge();
                         smokerCount++;
                         smoker = true;
                     }
     
+                    // Check if the patient has cancer
                     if (conditionID >= 3 && conditionID <= 5) {
                         averageCancerAge += patient.getAge();
                         cancerCount++;
                         cancer = true;
                     }
+                    // Check if the patient is a smoker and has cancer
                     if(smoker && cancer){
                         smokeAndCancerCount++;
                     }
@@ -653,6 +673,7 @@ void displayStatistics() { // Display general statistics
 
     }
 
+    // Function to import users from the USERDETAILS CSV file
     bool importUsers() {
         std::ifstream inputtedCSV(USERDETAILS);
     
@@ -721,6 +742,7 @@ void registerNewUser(std::string newUserRole) {
 
         bool isValidUsername = false;
 
+        
         while(!isValidUsername) {
             std::cout << "Enter new " << newUserRole << " Name: ";
             std::getline(std::cin, newUserName);
@@ -733,6 +755,7 @@ void registerNewUser(std::string newUserRole) {
 
             isValidUsername = true; // Assume the username is unique initially
 
+            
             for(const User& user : users) {
                 if(newUserName == user.getUserName()) { 
                     std::cout << "Username is already in use, please try again" << '\n';
@@ -797,7 +820,7 @@ bool getConditions() {
             std::getline(conditionsCSV, treatment, ',');
             std::getline(conditionsCSV, frequency, ',');
             std::getline(conditionsCSV, cost, ',');
-            std::getline(conditionsCSV, treatmentLength, '\r'); // \r because my personal computer is a mac - REMOVE WHEN SUBMITTING
+            std::getline(conditionsCSV, treatmentLength, '\r'); // \r because my personal computer is a mac
             
             if (ID == "ID") {  // Skip header row
                 continue; 
