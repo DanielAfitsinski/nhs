@@ -63,6 +63,17 @@
         "type_traits": "cpp",
         "utility": "cpp",
         "format": "cpp",
-        "iostream": "cpp"
+        "iostream": "cpp",
+        "fstream": "cpp",
+        "iomanip": "cpp",
+        "mutex": "cpp",
+        "clocale": "cpp",
+        "codecvt": "cpp",
+        "condition_variable": "cpp",
+        "deque": "cpp",
+        "forward_list": "cpp",
+        "semaphore": "cpp",
+        "span": "cpp",
+        "stack": "cpp"
     }
 }

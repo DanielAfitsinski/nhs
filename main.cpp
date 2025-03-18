@@ -6,11 +6,6 @@
 #include <iomanip> // Added for setw and setfill
 
 
-//TODO - Assign Nurses To Patients
-//TODO - Fix Logic For Empty PatientsConditions Vector vs Having A 0 For Healthy Condition
-//TODO - Validation
-//TODO - Add Patient History Of Smoking / Cancer / Diabetes ??
-
 
 const std::string USERDETAILS = "USERDETAILS.csv"; // Constant File path to text file containing login details
 const std::string CONDITIONS = "CONDITIONS.csv"; // Constant File path to text file containing all Conditions
@@ -351,6 +346,34 @@ CSV << '"';
     }
 }
 
+void assignPatientToNurse(){
+    clearConsole();
+    std::cout << "Patients that currently do not have a nurse assigned to them:\n\n";
+
+    for(auto& user : users){
+        if(user.getRole() == "Patient" && user.getNurseName() == "N/A"){
+            std::cout << "ID: " << user.getUserID() << " User: " << user.getUserName() << "\n";
+        }
+    }
+
+    std::cout << "\nEnter Patient ID(0 to cancel): ";
+    int patientID = 0;
+    std::cin >> patientID;
+
+    if(patientID != 0){
+        for(auto& user : users){
+            if(user.getUserID() == patientID){
+                user.setNurseName(loggedUser.getUserName());
+                updateUsersCSV();
+                clearConsole();
+                std::cout << "Patient Successfully Assigned";
+                break;
+            }
+        }
+    }
+
+    userContinue();
+}
 
 bool isValidPassword(const std::string& password) {
     bool hasLower = false;
@@ -643,10 +666,10 @@ void displayStatistics() { // Display general statistics
         std::string ID, username, password, age, role, doctorName, nurseName, condition;
     
         while (std::getline(inputtedCSV, ID, ',') && std::getline(inputtedCSV, username, ',') &&
-               std::getline(inputtedCSV, password, ',') && std::getline(inputtedCSV, age, ',') &&
-               std::getline(inputtedCSV, role, ',') && std::getline(inputtedCSV, doctorName, ',') && 
-               std::getline(inputtedCSV, doctorName, ',') && std::getline(inputtedCSV, condition)) {
-    
+                std::getline(inputtedCSV, password, ',') && std::getline(inputtedCSV, age, ',') &&
+                std::getline(inputtedCSV, role, ',') && std::getline(inputtedCSV, doctorName, ',') && 
+                std::getline(inputtedCSV, nurseName, ',') && std::getline(inputtedCSV, condition)) {
+                
             if (ID == "ID") continue;  // Skip header row
     
             // Remove surrounding double quotes from condition field if they exist
@@ -723,7 +746,7 @@ void registerNewUser(std::string newUserRole) {
 
         while(!isValidPasswordBool){
             std::cout << "Enter new " << newUserRole << " Password: ";
-            // fix for getline bugging
+            
             std::getline(std::cin, newUserPassword);
             
             if(newUserPassword.length() < 8 || hasWhitespace(newUserPassword) || !isValidPassword(newUserPassword)){
@@ -850,7 +873,7 @@ void displayMenu() { // Display main menu screen
 
         while (!logout) {
             clearConsole();
-            std::cout << "1: My Details\n2: View or Update My Patients Details (Doctor)\n3: View or Update Any Patients Details (Pharmacist)\n4: View Statistics (Doctor)\n5: Register New Doctor/Nurse (Doctor/Nurse)\n6: Register New Pharmacist (Pharmacist)\n7: Assign Patients\n8: Logout\n\nPlease select an option: ";
+            std::cout << "1: My Details\n2: View or Update My Patients Details (Doctor)\n3: View or Update Any Patients Details (Pharmacist)\n4: View Statistics (Doctor)\n5: Register New Doctor/Nurse (Doctor/Nurse)\n6: Register New Pharmacist (Pharmacist)\n7: Assign Doctor to Patient\n8: Assign Nurse to Patient\n9: Logout\n\nPlease select an option: ";
             std::cin >> menuOption;
 
             switch (menuOption) {
@@ -916,11 +939,19 @@ void displayMenu() { // Display main menu screen
                     assignPatientToDoctor();
                 }
                 else {
-                    showAccessDenied("Only Doctors Can Assign Patients.");
+                    showAccessDenied("Only Doctors Can Assign Doctors to Patients.");
                 }
                 
                 break;
             case 8:
+                if(loggedRole == "Nurse"){
+                    assignPatientToNurse();
+                }
+                else{
+                    showAccessDenied("Only Nurses Can Assign Nurses to Patients.");
+                }
+                break;
+            case 9:
                 logout = true;
                 break;
             default:
