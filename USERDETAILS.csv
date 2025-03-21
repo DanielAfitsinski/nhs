@@ -1,5 +1,5 @@
 ID,Username,Password,Age,Role,DoctorName,NurseName,ConditionID
-1,patient,dcc31792b8db0d30990535a05e5b613df6e285ad5dd33b91ce502223cda92c93,30,Patient,doctor,N/A,"4"
+1,patient,dcc31792b8db0d30990535a05e5b613df6e285ad5dd33b91ce502223cda92c93,30,Patient,doctor,nurse,"4"
 2,doctor,1e5f6c430dd6460cfdc9b1c16d42c6892da43765b3c89fd282e1d6bbc3205e68,40,Doctor,N/A,N/A,""
 3,nurse,e51a46487b4fbaf12aef8711abb2a23b2250753d96c55365b0a266e2e51b7bc2,50,Nurse,N/A,N/A,""
 4,pharmacist,0ff9940f6f5f715406a31c4dccc52f01c84abdec6a363d34594dda2a766838c9,60,Pharmacist,N/A,N/A,""
