@@ -268,20 +268,26 @@ void displayUserDetails(User& user) { // Displays the passed users details inclu
             double monthlyCost = 0.0;
             double yearlyCost = 0.0;
 
+            bool healthy = true;
             // Display all conditions and treatments
-            for (const auto& condition : usersConditions) {
-                std::cout << "\nCondition: " << condition.getCondition() << "\n";
-                if(condition.getCondition() != "Healthy"){
-                    std::cout << "Treatment: " << condition.getTreatment() << "\n\n";
-                    condition.displayTreatmentLength();
-                    std::cout << "\nFrequency: " << condition.getFrequency() << "\n\n";
-                    std::vector<double> costs = condition.calculateCost();
-                    dailyCost += costs[0];
-                    weeklyCost += costs[1];
-                    monthlyCost += costs[2];
-                    yearlyCost += costs[3];
+                for (const auto& condition : usersConditions) {
+                    std::cout << "\nCondition: " << condition.getCondition() << "\n";
+                    if(condition.getCondition() != "Healthy"){
+                        std::cout << "Treatment: " << condition.getTreatment() << "\n\n";
+                        condition.displayTreatmentLength();
+                        std::cout << "\nFrequency: " << condition.getFrequency() << "\n\n";
+                        std::vector<double> costs = condition.calculateCost();
+                        dailyCost += costs[0];
+                        weeklyCost += costs[1];
+                        monthlyCost += costs[2];
+                        yearlyCost += costs[3];
+                        healthy = false;
+                    }
                 }
+            if(healthy){
+                std::cout << "Patient is healthy";
             }
+            
 
             // Display total costs
             std::cout << "\n\nTotal Costs: \n";
@@ -372,18 +378,25 @@ void assignPatientToNurse(){
     int patientID = 0;
     std::cin >> patientID;
 
+    bool invalidID = true; // Assume ID is invalid
+
     if(patientID != 0){
         for(auto& user : users){
-            if(user.getUserID() == patientID){
+            if(user.getUserID() == patientID && user.getNurseName() == "N/A" && user.getRole() == "Patient"){
                 user.setNurseName(loggedUser.getUserName());
                 updateUsersCSV();
                 clearConsole();
                 std::cout << "Patient Successfully Assigned";
+                invalidID = false; // ID is valid
                 break;
             }
+            
         }
+        
     }
-
+    if(invalidID && patientID != 0){
+        std::cout << "Invalid Patient ID";
+    }
     userContinue();
 }
 
@@ -436,7 +449,12 @@ void changePatientsDetails(bool doctorView, int ID) {
 
             std::cout << "\n1: Edit Current Conditions\n2: Add New Condition\n3: Exit\n\nPlease select an option: ";
             int option = 0;
-            std::cin >> option;
+            
+            while(!(std::cin >> option)){
+                std::cin.clear();
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                std::cout << "Invalid input.  Try again: ";
+            }
 
             // Process the selected option
             switch(option){
@@ -472,13 +490,19 @@ void changePatientsDetails(bool doctorView, int ID) {
                         int oldConditionID;
                         std::cin >> oldConditionID;
 
+                        if(!selectedPatient.hasCondition(oldConditionID)){
+                            std::cout << "Patient does not have this condition";
+                            userContinue();
+                            clearConsole();
+                            break;
+                        }
+
                         std::cout << "Has this condition been cured: (y/n) ";
                         char cured;
                         std::cin >> cured;
                         if(cured == 'y'){
                             selectedPatient.removeCondition(oldConditionID);
                             updateUsersCSV();
-                            clearConsole();
                             std::cout << "Details Successfully Changed";
                             userContinue();
                             clearConsole();
@@ -589,14 +613,27 @@ void accessPatientsDetails(bool doctorView) {
             
             std::cout << "\nEnter Patient ID (0 to cancel): ";
             int response = 0;
-            std::cin >> response;
 
-            if (response != 0) {
-                changePatientsDetails(doctorView, response);
+            while(!(std::cin >> response)){
+                std::cin.clear();
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                std::cout << "Invalid input.  Try again: ";
             }
-            else {
+            bool myPatient = false;
+            if(response != 0){
+                for(const auto& user : users){
+                    if(user.getUserID() == response && user.getDoctorName() == loggedUser.getUserName()){
+                        myPatient = true;
+                        changePatientsDetails(doctorView, response);
+                    }
+                }
+                if(!myPatient){
+                    std::cout << "That patient isn't assigned to you\n\n";
+                }
+            }else{
                 done = true;
             }
+            
         }
     }
 // Function to calculate the average ages of smokers and cancer patients
@@ -738,7 +775,7 @@ void registerNewUser(std::string newUserRole) {
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Clear the input buffer
         std::string newUserName; //Get new users details
         std::string newUserPassword;
-        int newUserAge;
+        int newUserAge = 0;
 
         bool isValidUsername = false;
 
@@ -781,8 +818,14 @@ void registerNewUser(std::string newUserRole) {
 
         }
 
+
         std::cout << "Enter new " << newUserRole << " Age: ";
-        std::cin >> newUserAge;
+        while(!(std::cin >> newUserAge && newUserAge > 0 && newUserAge < 120)){
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            std::cout << "Invalid age.  Try again: ";
+        }
+           
 
         std::string doctorname = "";
         std::string nurseName = "";
@@ -870,16 +913,24 @@ void assignPatientToDoctor(){
     int patientID = 0;
     std::cin >> patientID;
 
+    bool invalidID = true;
+
     if(patientID != 0){
         for(auto& user : users){
-            if(user.getUserID() == patientID){
+            if(user.getUserID() == patientID && user.getDoctorName() == "N/A" && user.getRole() == "Patient"){
                 user.setDoctorName(loggedUser.getUserName());
                 updateUsersCSV();
                 clearConsole();
                 std::cout << "Patient Successfully Assigned";
+                invalidID = false;
                 break;
             }
+            
         }
+        
+    }
+    if(invalidID && patientID != 0){
+        std::cout << "Invalid Patient ID";
     }
 
     userContinue();
@@ -888,16 +939,21 @@ void assignPatientToDoctor(){
 void displayMenu() { // Display main menu screen
         clearConsole();
 
-        std::cout << "Welcome " << loggedUser.getUserName() << '\n';
+       
         const std::string& loggedRole = loggedUser.getRole();
 
-        int menuOption = 0;
         bool logout = false;
-
+        
         while (!logout) {
+            int menuOption = 0;
             clearConsole();
             std::cout << "1: My Details\n2: View or Update My Patients Details (Doctor)\n3: View or Update Any Patients Details (Pharmacist)\n4: View Statistics (Doctor)\n5: Register New Doctor/Nurse (Doctor/Nurse)\n6: Register New Pharmacist (Pharmacist)\n7: Assign Doctor to Patient\n8: Assign Nurse to Patient\n9: Logout\n\nPlease select an option: ";
-            std::cin >> menuOption;
+
+            while(!(std::cin >> menuOption)){
+                std::cin.clear();
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                std::cout << "Invalid input.  Try again: ";
+            }
 
             switch (menuOption) {
             case 1:
@@ -925,8 +981,8 @@ void displayMenu() { // Display main menu screen
                 break;
             case 5:
                 if (loggedRole == "Doctor" || loggedRole == "Pharmacist" || loggedRole == "Nurse") {
-                    std::cout << "Which role are you registering: " << '\n';
                     std::cout << "1: Doctor\n2: Nurse\n3:Exit";
+                    std::cout << "\nWhich role are you registering: ";
                     
                     int newRole = 0;
                     std::cin >> newRole;
