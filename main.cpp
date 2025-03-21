@@ -291,10 +291,10 @@ void displayUserDetails(User& user) { // Displays the passed users details inclu
 
             // Display total costs
             std::cout << "\n\nTotal Costs: \n";
-            std::cout << "Daily Cost: " << dailyCost << "\n";
-            std::cout << "Weekly Cost: " << weeklyCost << "\n";
-            std::cout << "Monthly Cost: " << monthlyCost << "\n";
-            std::cout << "Yearly Cost: " << yearlyCost << "\n";
+            std::cout << "Daily Cost £:" << dailyCost << " $:" << dailyCost * 1.29 << "\n";
+            std::cout << "Weekly Cost:" << weeklyCost << " $:" << weeklyCost * 1.29 <<"\n";
+            std::cout << "Monthly Cost:" << monthlyCost << " $:" << monthlyCost * 1.29 <<"\n";
+            std::cout << "Yearly Cost:" << yearlyCost << " $:" << yearlyCost * 1.29 << "\n";
         }
 
     }
@@ -690,10 +690,10 @@ void calculateCostForEveryCondition(){
             condition.displayTreatmentLength();
             std::cout << "\n";
             std::vector<double> costs = condition.calculateCost();
-            std::cout << "Daily Cost: " << condition.calculateCost()[0] << "\n";
-            std::cout << "Weekly Cost: " << condition.calculateCost()[1] << "\n";
-            std::cout << "Monthly Cost: " << condition.calculateCost()[2] << "\n";
-            std::cout << "Yearly Cost: " << condition.calculateCost()[3] << "\n";
+            std::cout << "Daily Cost £: " << condition.calculateCost()[0] << " $: " << condition.calculateCost()[0] * 1.29 << "\n";
+            std::cout << "Weekly Cost £: " << condition.calculateCost()[1] << " $: " << condition.calculateCost()[1] * 1.29 << "\n";
+            std::cout << "Monthly Cost £: " << condition.calculateCost()[2] << " $: " << condition.calculateCost()[2] * 1.29 <<  "\n";
+            std::cout << "Yearly Cost £: " << condition.calculateCost()[3] <<  " $: " <<  condition.calculateCost()[3] * 1.29 << "\n";
         }
     }
 
